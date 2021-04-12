@@ -91,7 +91,7 @@ However, the strong performance and memory benefits of cooperative multitasking 
 
 ## Async/Await in Rust
 
-The Rust language provides first-class support for cooperative multitasking in form of async/await. Before we can explore what async/await is and how it works, we need to understand how _futures_ and asynchronous programming work in Rust.
+The Rust language provides first-class support for cooperative multitasking in the form of async/await. Before we can explore what async/await is and how it works, we need to understand how _futures_ and asynchronous programming work in Rust.
 
 ### Futures
 
@@ -687,7 +687,7 @@ For further reading, check out the documentation of the [`pin` module] and the [
 
 #### Pinning and Futures
 
-As we already saw in this post, the [`Future::poll`] method uses pinning in form of a `Pin<&mut Self>` parameter:
+As we already saw in this post, the [`Future::poll`] method uses pinning in the form of a `Pin<&mut Self>` parameter:
 
 [`Future::poll`]: https://doc.rust-lang.org/nightly/core/future/trait.Future.html#tymethod.poll
 
@@ -1643,7 +1643,7 @@ impl Wake for TaskWaker {
 }
 ```
 
-The trait is still unstable, so we have to add **`#![feature(wake_trait)]`** to the top of our `lib.rs` to use it. Since wakers are commonly shared between the executor and the asynchronous tasks, the trait methods require that the `Self` instance is wrapped in the [`Arc`] type, which implements reference-counted ownership. This means that we have to move our `TaskWaker` to an `Arc` in order to call them.
+Since wakers are commonly shared between the executor and the asynchronous tasks, the trait methods require that the `Self` instance is wrapped in the [`Arc`] type, which implements reference-counted ownership. This means that we have to move our `TaskWaker` to an `Arc` in order to call them.
 
 The difference between the `wake` and `wake_by_ref` methods is that the latter only requires a reference to the `Arc`, while the former takes ownership of the `Arc` and thus often requires an increase of the reference count. Not all types support waking by reference, so implementing the `wake_by_ref` method is optional, however it can lead to better performance because it avoids unnecessary reference count modifications. In our case, we can simply forward both trait methods to our `wake_task` function, which requires only a shared `&self` reference.
 
@@ -1758,7 +1758,7 @@ if self.task_queue.is_empty() {
 
 In case this interrupt pushes to the `task_queue`, we put the CPU to sleep even though there is now a ready task. In the worst case, this could delay the handling of a keyboard interrupt until the next keypress or the next timer interrupt. So how do we prevent it?
 
-The answer is to disable interrupts on the CPU before the check and atomically enable them again together with the `hlt` instruction. This way, all interrupts that happen in between are delayed after the `hlt` instruction so that no wake-ups are missed. To implement this approach, we can use the [`interrupts::enable_and_hlt`][`enable_and_hlt`] function provided by the [`x86_64`] crate. This function is only available since version 0.9.6, so you might need to update your `x86_64` dependency to use it.
+The answer is to disable interrupts on the CPU before the check and atomically enable them again together with the `hlt` instruction. This way, all interrupts that happen in between are delayed after the `hlt` instruction so that no wake-ups are missed. To implement this approach, we can use the [`interrupts::enable_and_hlt`][`enable_and_hlt`] function provided by the [`x86_64`] crate.
 
 [`enable_and_hlt`]: https://docs.rs/x86_64/0.13.2/x86_64/instructions/interrupts/fn.enable_and_hlt.html
 
